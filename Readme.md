@@ -37,7 +37,9 @@ This is the backend API for the VerbaTone project, a text-to-speech (TTS) web ap
    API_KEY=your_api_key
    ```
 
-5. Ensure that the `best_model.pth` and `config.json` files are located in the same directory as `app.py`.
+5. Ensure that the `best_model.pth` and `config.json` files are located in the same directory as `app.py`. These files, including the custom-trained model (best_model.pth), are already present in this repository.
+
+6. If you'd like to explore the training process used for the model, you can access the Colab notebook used for training [here]{https://colab.research.google.com/drive/14BtqIO1gkU8TrAsUyI5HG1FQoGWesVb2?usp=sharing}
 
 ## Running the Application
 
