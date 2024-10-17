@@ -12,7 +12,9 @@ allowed_origins = ["https://verbatone.netlify.app"]
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best_model.pth')
+VOLUME_MOUNT_PATH = os.getenv('RAILWAY_VOLUME_MOUNT_PATH')
+
+MODEL_PATH = os.path.join(VOLUME_MOUNT_PATH, 'best_model.pth')
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json') 
 
 try:
