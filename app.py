@@ -12,15 +12,12 @@ allowed_origins = ["https://verbatone.netlify.app"]
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+synthesizer = None
+
 VOLUME_MOUNT_PATH = os.getenv('RAILWAY_VOLUME_MOUNT_PATH')
 
 MODEL_PATH = os.path.join(VOLUME_MOUNT_PATH, 'best_model.pth')
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json') 
-
-try:
-    synthesizer = Synthesizer(MODEL_PATH, CONFIG_PATH, use_cuda=False)
-except Exception as e:
-    raise RuntimeError(f"Failed to initialize synthesizer: {str(e)}")
 
 @app.route('/synthesize', methods=['POST'])
 def synthesize():
@@ -36,13 +33,16 @@ def synthesize():
         if len(text) > 1000:
             return jsonify({'error': 'Text is too long'}), 400
 
-        wav = synthesizer.tts(text)
+        global synthesizer
+        if synthesizer is None:
+            synthesizer = Synthesizer(MODEL_PATH, CONFIG_PATH, use_cuda=False)
+            wav = synthesizer.tts(text)
 
-        wav_bytes = io.BytesIO()
-        synthesizer.save_wav(wav, wav_bytes)
-        wav_bytes.seek(0)
+            wav_bytes = io.BytesIO()
+            synthesizer.save_wav(wav, wav_bytes)
+            wav_bytes.seek(0)
 
-        return send_file(wav_bytes, mimetype='audio/wav', as_attachment=True, download_name='output.wav')
+            return send_file(wav_bytes, mimetype='audio/wav', as_attachment=True, download_name='output.wav')
     except FileNotFoundError:
         return jsonify({'error': 'Model or config file not found'}), 500
     except Exception as e:
